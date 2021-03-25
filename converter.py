@@ -160,24 +160,24 @@ def _load_executive_salaries(ws: worksheet) -> List[ExecutiveSalary]:
 
 def add_child_nodes(parent_node, data: List[dict]) -> None:
     for item in data:
-        child_node = ElementTree.SubElement(parent_node, "Период")
+        child_node = ElementTree.SubElement(parent_node, 'Период')
         for key, value in item.represent_to_xml():
             node = ElementTree.SubElement(child_node, key)
             node.text = value
 
 
 def add_salary_fond_node(root_node, data) -> None:
-    parent_node = ElementTree.SubElement(root_node, "ФондЗП")
+    parent_node = ElementTree.SubElement(root_node, 'ФондЗП')
     add_child_nodes(parent_node, data)
 
 
 def add_executive_salary_node(root_node, data) -> None:
-    parent_node = ElementTree.SubElement(root_node, "СЗПРук")
+    parent_node = ElementTree.SubElement(root_node, 'СЗПРук')
     add_child_nodes(parent_node, data)
 
 
 def create_xml_file(temp_filename, filename, salary_fund_data, executive_salary):
-    root = ElementTree.Element("ЭДПФР", xmlns='http://пф.рф/СИоЗП/2021-03-15')
+    root = ElementTree.Element('ЭДПФР', xmlns='http://пф.рф/СИоЗП/2021-03-15')
     root.set('xmlns:УТ2', 'http://пф.рф/УТ/2017-08-21')
     root.set('xmlns:АФ5', 'http://пф.рф/АФ/2018-12-07')
     main_node = ElementTree.Element('СИоЗП')
