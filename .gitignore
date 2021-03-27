@@ -1,1 +1,8 @@
 .idea/
+__pycache__/
+config.env
+*.log
+*.xlsx
+*.xml
+!/output/example.xml
+!/input/example.xlsx

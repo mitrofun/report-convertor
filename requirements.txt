@@ -1,4 +1,1 @@
-openpyxl
-pydantic
-loguru
-vkbeautify
+-r requirements/base.txt
