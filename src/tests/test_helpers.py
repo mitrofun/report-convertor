@@ -1,6 +1,6 @@
 import pytest
 
-from converter import convert_experience, decompose_full_name
+from src.helpers import convert_experience, decompose_full_name
 
 
 @pytest.mark.parametrize(
@@ -8,7 +8,7 @@ from converter import convert_experience, decompose_full_name
     [
         ('0 лет 00 мес', '00.00'),
         ('5 лет 10 мес', '05.10'),
-        ('0 лет 06 мес', '00.06')
+        ('0 лет 06 мес', '00.06'),
     ],
 )
 def test_convert_exchange(test_input, expected):

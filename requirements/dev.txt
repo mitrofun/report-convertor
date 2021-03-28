@@ -1,2 +1,4 @@
 -r ./base.txt
 pytest
+flake8
+flake8-adjustable-complexity

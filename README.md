@@ -22,15 +22,21 @@ pip install -r requirements/dev.txt
 ```
 cp example.ini settings.ini
 ```
-Запуск конвертора
+Запуск
 ```
-python converter.py
+python main.py
+```
+
+## Тесты
+Запуск тестов
+```
+pytest
 ```
 
 ## Сборка исполнительного файла для Windows.
 На Windows машине выполните
 ```
 pip install https://github.com/pyinstaller/pyinstaller/tarball/develop
-pyinstaller --clean --onefile --noconsole converter.py
+pyinstaller --clean --onefile --noconsole --name converter main.py
 ```
 Собранный exe файл находиться в папке dist проекта
