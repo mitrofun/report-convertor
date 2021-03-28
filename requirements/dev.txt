@@ -1,4 +1,6 @@
 -r ./base.txt
 pytest
 flake8
-flake8-adjustable-complexity
+flake8-print
+pep8-naming
+flake8-expression-complexity
