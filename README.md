@@ -1,5 +1,7 @@
 # Конвертор для СИоЗП.2.57.3п
 
+[![CircleCI](https://circleci.com/gh/mitrofun/report-convertor.svg?style=svg)](https://circleci.com/gh/mitrofun/report-convertor)
+
 Генерирует xml для загрузки в пенсионный фонд из печатной формы xlsx файла СИоЗП.2.57.3п (Формы сбора информации о заработной плате работников государственных и муниципальных учреждений)
 
 ## Зависимости
