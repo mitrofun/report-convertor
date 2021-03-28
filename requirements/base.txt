@@ -1,5 +1,5 @@
+python-decouple
 openpyxl
 pydantic
 loguru
-vkbeautify
 dateparser

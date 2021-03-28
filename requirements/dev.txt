@@ -1,3 +1,2 @@
 -r ./base.txt
-pyinstaller
 pytest

@@ -4,28 +4,33 @@ from enum import Enum
 from datetime import datetime
 from typing import List, Optional
 from xml.etree import ElementTree
+from xml.dom.minidom import parseString
 
+
+from decouple import config
 from dateparser import DateDataParser
 from openpyxl import load_workbook, worksheet
 from loguru import logger
-from pydantic import BaseModel, BaseSettings, Field, validator, parse_obj_as, ValidationError, root_validator
-import vkbeautify as vkb
+from pydantic import (
+    BaseModel,
+    Field,
+    ValidationError,
+    validator,
+    parse_obj_as,
+    root_validator,
+)
 
 
 logger.add("report.log", enqueue=True)
 
+# Settings
 ALLOW_CATEGORY_CODE = (201, 221, 291, 211, 232, 233, 242, 243, 261, 401, 431, 411, 421, 501, 311, 281, 100, 600,)
 
-
-class Settings(BaseSettings):
-    report: str = 'example.xlsx'
-    input_dir: str = './input'
-    output_dir: str = './output'
-    code_to: str
-    reg_number: str
-
-    class Config:
-        env_file = 'config.env'
+REPORT = config('REPORT', default='example.xlsx')
+INPUT_DIR = config('INPUT_DIR', default='input')
+OUTPUT_DIR = config('OUTPUT_DIR', default='output')
+CODE_TO = config('CODE_TO', default='201000')
+REG_NUMBER = config('REG_NUMBER', default='034012008689')
 
 
 class IndexEnum(Enum):
@@ -393,7 +398,7 @@ def add_system_node(root_node, guid) -> None:
     node.text = datetime.now().isoformat()
 
 
-def create_xml_file(temp_filename, filename, salary_data, salary_fund_data, executive_salary, guid, salary_emp_data):
+def create_xml_file(filename, salary_data, salary_fund_data, executive_salary, guid, salary_emp_data):
     root = ElementTree.Element('ЭДПФР', xmlns='http://пф.рф/СИоЗП/2021-03-15')
     root.set('xmlns:УТ2', 'http://пф.рф/УТ/2017-08-21')
     root.set('xmlns:АФ5', 'http://пф.рф/АФ/2018-12-07')
@@ -409,16 +414,20 @@ def create_xml_file(temp_filename, filename, salary_data, salary_fund_data, exec
     add_executive_salary_node(main_node, executive_salary)
     # system info
     add_system_node(main_node, guid)
-    tree = ElementTree.ElementTree(root)
-
-    tree.write(temp_filename, encoding='utf-8', xml_declaration=True)
-    vkb.xml(temp_filename, filename)
-
-
-def delete_file(filename: str) -> None:
-    """Delete file if exist"""
-    if os.path.exists(filename):
-        os.remove(filename)
+    # for pretty file without minification
+    # if not need pretty
+    #
+    # code:
+    # tree = ElementTree.ElementTree(root)
+    # tree.write(filename, encoding='utf-8', xml_declaration=True)
+    #
+    # And delete code further in function
+    xml_string = ElementTree.tostring(
+        root, encoding='utf-8', method='xml', xml_declaration=True, short_empty_elements=True)
+    xml = parseString(xml_string)
+    xml_pretty_str = xml.toprettyxml(encoding="utf-8")
+    with open(filename, mode='wb') as result:
+        result.write(xml_pretty_str)
 
 
 def create_group_by_period_salary_data(salary_data) -> List[Period]:
@@ -465,11 +474,11 @@ def main(base_dir: str):
     """
     logger.info('Start load data')
     guid: str = str(uuid.uuid4())
-    settings = Settings()
-    temp_xml_file = os.path.join(base_dir, settings.output_dir, 'temp.xml')
-    file_name = f'ПФР_{settings.code_to}_СИоЗП_{settings.reg_number}_{datetime.now().strftime("%Y%m%d")}_{guid}.xml'
-    xml_file = os.path.join(base_dir, settings.output_dir, file_name)
-    report_file = os.path.join(base_dir, settings.input_dir, settings.report)
+    logger.info('Read settings')
+
+    file_name = f'ПФР_{CODE_TO}_СИоЗП_{REG_NUMBER}_{datetime.now().strftime("%Y%m%d")}_{guid}.xml'
+    xml_file = os.path.join(base_dir, OUTPUT_DIR, file_name)
+    report_file = os.path.join(base_dir, INPUT_DIR, REPORT)
     logger.info(f'Read file: {report_file}')
     wb = load_workbook(filename=report_file, read_only=True)
     salary_data = _load_salary(wb['Раздел 1'])
@@ -479,7 +488,6 @@ def main(base_dir: str):
     wb.close()
     logger.info('Generate xml file start')
     create_xml_file(
-        temp_xml_file,
         xml_file,
         salary_by_period_data,
         salary_fund_data,
@@ -487,7 +495,6 @@ def main(base_dir: str):
         guid,
         salary_data
     )
-    delete_file(temp_xml_file)
     logger.info(f'Complete generate xml file: {file_name}')
 
 

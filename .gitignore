@@ -1,6 +1,7 @@
 .idea/
+.pytest_cache
 __pycache__/
-config.env
+settings.ini
 *.log
 *.xlsx
 *.xml
