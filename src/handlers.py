@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Any
 from xml.etree import ElementTree
 from xml.dom.minidom import parseString
 
@@ -37,7 +37,7 @@ def _get_value_list(rows, for_row: int) -> List[List[int or float or None]]:
     return values
 
 
-def _add_child_nodes(parent_node, data: List[dict]) -> None:
+def _add_child_nodes(parent_node, data: List[Any]) -> None:
     for item in data:
         child_node = ElementTree.SubElement(parent_node, 'Период')
         for key, value in item.represent_to_xml():
@@ -45,7 +45,7 @@ def _add_child_nodes(parent_node, data: List[dict]) -> None:
             node.text = value
 
 
-def _add_period_nodes(parent_node, data: List[dict]) -> None:
+def _add_period_nodes(parent_node, data: List[Any]) -> None:
     for item in data:
         child_node = ElementTree.SubElement(parent_node, 'Период')
         sub_nodes = ElementTree.SubElement(child_node, 'ОтчетныйПериод')

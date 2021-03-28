@@ -1,10 +1,16 @@
 version: 2.1
+defaults: &defaults
+  docker:
+    - image: cimg/python:3.8.8
+
 jobs:
   build:
-    docker:
-      - image: cimg/python:3.8.8
+    <<: *defaults
     steps:
       - checkout
+      - restore_cache:
+            key: deps-{{ checksum "requirements/dev.txt" }}
+
       - run:
           command: |
             python3 -m venv venv
@@ -14,7 +20,37 @@ jobs:
           key: deps2-{{ checksum "requirements/dev.txt" }}
           paths:
             - 'venv'
+
       - run:
+          name: Run linters
+          command: |
+            . venv/bin/activate
+            flake8 . --statistics --count
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - 'venv'
+            - '.'
+
+  test:
+    <<: *defaults
+
+    steps:
+      - attach_workspace:
+          at: .
+
+      - run:
+          name: Run test
           command: |
             . venv/bin/activate
             pytest
+
+workflows:
+  version: 2
+  continuous-delivery:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
